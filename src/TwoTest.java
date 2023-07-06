@@ -12,6 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
+import java.util.List;
 
 
 public class TwoTest {
@@ -40,45 +41,58 @@ public class TwoTest {
     @Test
     public void firstTest() {
         waitForElementAndClick(
-            By.xpath("//*[contains(@text,'Search Wikipedia')]"),
-            "Cannot find 'Search Wikipedia' input",
-            5
-    );
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
+                "Cannot find 'Search Wikipedia' input",
+                5
+        );
 
         waitForElementAndSendKeys(
-            By.xpath("//*[contains(@text,'Search…')]"),
-            "JAVA",
-            "Cannot find search input",
-            8
-    );
+                By.xpath("//*[contains(@text,'Search…')]"),
+                "JAVA",
+                "Cannot find search input",
+                8
+        );
 
-        WebElement search_results_element = findElement(
-            By.id("org.wikipedia:id/page_list_item_title"),
-            "Cannot find search list results",
-            15
-    );
+        int elementCount = driver.findElements(
+                        By.id("org.wikipedia:id/page_list_item_title"))
+                .size();
 
-        String searchResultText = search_results_element.getText();
-        Assert.assertTrue(
-                "No matches for the word Java",
-                searchResultText.contains("Java")
-    );
-}
+        List<WebElement> elementSearch = driver.findElements(
+                By.id("org.wikipedia:id/page_list_item_title")
 
-    private WebElement findElement(By by, String error_message, long timeoutInSeconds) {
+        );
+
+
+
+        for (int i=0; i<elementCount; i++) {
+
+            System.out.println(elementSearch
+                    .get(i)
+                    .getAttribute("text")
+            );
+
+            Assert.assertTrue(elementSearch
+                    .get(i)
+                    .getAttribute("text")
+                    .contains("Java")
+            );
+        }
+    }
+
+    private WebElement findElements(By by, String error_message, long timeoutInSeconds) {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
         wait.withMessage(error_message + "\n");
         return wait.until(ExpectedConditions.presenceOfElementLocated(by));
     }
 
     private WebElement waitForElementAndClick(By by, String error_message, long timeoutSeconds) {
-        WebElement element = findElement(by, error_message, timeoutSeconds);
+        WebElement element = findElements(by, error_message, timeoutSeconds);
         element.click();
         return element;
     }
 
     private WebElement waitForElementAndSendKeys(By by, String value, String error_message, long timeoutSeconds) {
-        WebElement element = findElement(by, error_message, timeoutSeconds);
+        WebElement element = findElements(by, error_message, timeoutSeconds);
         element.sendKeys(value);
         return element;
     }

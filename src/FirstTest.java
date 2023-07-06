@@ -439,7 +439,7 @@ public class FirstTest {
             "text",
             "Cannot find title of article my list",
             15
-    );
+        );
 
         waitForElementAndClick(
                 By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='JavaScript']"),
@@ -628,21 +628,48 @@ public class FirstTest {
         );
     }
 
+    @Test //Этот тест проверяет открывает статью и сразу убеждается что у статьи есть title
+    public void testElementPresent() {
+        String search_wikipedia = "//*[contains(@text,'Search Wikipedia')]";
+        String search_line = "//*[contains(@text,'Search…')]";
+        String search_value = "JAVA";
+        String name_of_folder = "Eldar";
+        String close_article = "//android.widget.ImageButton[@content-desc='Navigate up']";
+        String locator_article_java = "//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='High-level programming language']";
+        String title_text = "org.wikipedia:id/view_page_title_text";
 
-  /*  @Test // Это тест который проверяет наличие текста в поле поиска
-    public void threeElementTestEx2CreateMethod()
-    {
-        waitForElementandClick(
-                By.id("org.wikipedia:id/search_container"),
+
+        waitForElementAndClick(
+                By.xpath(search_wikipedia),
                 "Cannot find 'Search Wikipedia' input",
                 5
         );
-        assertElementHasText(
-                By.xpath("//*[resource-id ='org.wikipedia:id/search_src_text']//*[@text,'Search…']"),
+
+        waitForElementAndSendKeys(
+                By.xpath(search_line),
+                search_value,
                 "Cannot find search input",
                 5
         );
-    }*/
+
+        waitForElementAndClick(
+                By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']"),
+                "Cannot find 'Search Wikipedia' input",
+                0
+        );
+
+        assertElementPresent(
+                By.id("org.wikipedia:id/view_page_title_text"),
+                "No title element in article"
+        );
+
+    }
+
+    private void assertElementPresent(By by, String error_message)
+    {
+        WebElement element = waitForElementPresent(by, "Cannot find element");
+        Assert.assertTrue("Element is not displayed", element.isDisplayed());
+    }
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds)
     {
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSeconds);
@@ -775,4 +802,5 @@ public class FirstTest {
         return element.getAttribute(attribute);
 
     }
+
 }

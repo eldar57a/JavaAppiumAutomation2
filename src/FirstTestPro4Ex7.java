@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.ScreenOrientation;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,7 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.net.URL;
 import java.util.List;
 
-public class FirstTestPro4Ex6 {
+public class FirstTestPro4Ex7 {
 
     private AppiumDriver driver;
 
@@ -39,43 +40,68 @@ public class FirstTestPro4Ex6 {
         driver.quit();
     }
 
-    @Test //Этот тест проверяет открывает статью и сразу убеждается что у статьи есть title
-    public void testElementPresent() {
-        String search_wikipedia = "//*[contains(@text,'Search Wikipedia')]";
-        String search_line = "//*[contains(@text,'Search…')]";
-        String search_value = "JAVA";
-
-
+    @Test //Отображение текста при повороте телефона в горизонтальное положение
+    public void testChangeScreenOrientationOnSearchResults()
+    {
+        driver.rotate(ScreenOrientation.PORTRAIT);
         waitForElementAndClick(
-                By.xpath(search_wikipedia),
+                By.xpath("//*[contains(@text,'Search Wikipedia')]"),
                 "Cannot find 'Search Wikipedia' input",
                 5
         );
 
+        String search_line = "JAVA";
         waitForElementAndSendKeys(
-                By.xpath(search_line),
-                search_value,
+                By.xpath("//*[contains(@text,'Search…')]"),
+                search_line,
                 "Cannot find search input",
                 5
         );
 
         waitForElementAndClick(
                 By.xpath("//*[@resource-id='org.wikipedia:id/page_list_item_container']//*[@text='Object-oriented programming language']"),
-                "Cannot find 'Search Wikipedia' input",
-                0
+                "Cannot find 'Object-oriented programming language' topic searching by " + search_line,
+                15
         );
 
-        assertElementPresent(
+        String title_before_rotation = waitForElementAndGetAttribute(
                 By.id("org.wikipedia:id/view_page_title_text"),
-                "No title element in article"
+                "text",
+                "Cannot find title of article",
+                15
         );
 
-    }
+        driver.rotate(ScreenOrientation.LANDSCAPE);
 
-    private void assertElementPresent(By by, String error_message)
-    {
-        WebElement element = waitForElementPresent(by, "Cannot find element");
-        Assert.assertTrue("Element is not displayed", element.isDisplayed());
+        String title_after_rotation = waitForElementAndGetAttribute(
+                By.id("org.wikipedia:id/view_page_title_text"),
+                "text",
+                "Cannot find title of article",
+                15
+        );
+
+        Assert.assertEquals(
+                "Article title have been changed after screen rotation",
+                title_before_rotation,
+                title_after_rotation
+        );
+
+
+        driver.rotate(ScreenOrientation.PORTRAIT);
+
+        String title_after_second_rotation = waitForElementAndGetAttribute(
+                By.id("org.wikipedia:id/view_page_title_text"),
+                "text",
+                "Cannot find title of article",
+                15
+        );
+
+        Assert.assertEquals(
+                "Article title have been changed after screen rotation",
+                title_before_rotation,
+                title_after_second_rotation
+        );
+
     }
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSeconds)
     {
